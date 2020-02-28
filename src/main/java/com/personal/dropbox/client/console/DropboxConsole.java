@@ -45,6 +45,7 @@ public class DropboxConsole {
       default:
         System.out.println("Invalid or Operation not supported yet: " + args[0]);
         System.out.println("Supported operations are \"auth\" \"list\" \"info\" ");
+        terminate(0);
     }
   }
 
@@ -74,6 +75,7 @@ public class DropboxConsole {
     }
     System.out.println("User id " + authFinish.getUserId());
     System.out.println("Your access token:\n" + authFinish.getAccessToken());
+    System.exit(0);
   }
 
   private void userInfoHandler(String accessToken) {
@@ -81,22 +83,24 @@ public class DropboxConsole {
     if (fullAccount.isPresent()) {
       FullAccount account = fullAccount.get();
       System.out.println("-----------------------------------------------------");
-      System.out.println("Account ID: \t\t" + account.getAccountId());
+      System.out.println("Account ID: \t" + account.getAccountId());
       System.out.println("Display Name: \t" + account.getName()
                                                      .getDisplayName());
-      System.out.println("Name: \t\t\t\t\t" + account.getName()
+      System.out.println("Name: \t\t" + account.getName()
                                                      .getGivenName() + " " + account.getName()
                                                                                     .getSurname()
           + " ("
           + account.getName()
                    .getFamiliarName() + ")");
       System.out.println(
-          "Email: \t\t\t\t\t" + account.getEmail() + getEmailStatus(account.getEmailVerified()));
-      System.out.println("Country: \t\t\t\t" + account.getCountry());
+          "Email: \t\t" + account.getEmail() + getEmailStatus(account.getEmailVerified()));
+      System.out.println("Country: \t" + account.getCountry());
       System.out.println("Referral link:  " + account.getReferralLink());
       System.out.println("-----------------------------------------------------");
+      terminate(0);
     } else {
       System.out.println("Unable to get user info");
+      terminate(1);
     }
   }
 
@@ -118,8 +122,12 @@ public class DropboxConsole {
     System.out.println("-----------------------------------------------------");
     System.out.println(path + " \t\t\t\t\t\t : dir");
     listFolderResult.ifPresentOrElse(listFolder -> displayDirectoryInfo(path, listFolder),
-        () -> System.out.println("Unable to get directory info " + path));
+        () -> {
+          System.out.println("Unable to get directory info " + path);
+          terminate(1);
+        });
     System.out.println("-----------------------------------------------------");
+    terminate(0);
 
   }
 
@@ -127,7 +135,11 @@ public class DropboxConsole {
     Optional<Metadata> fileDetails = dropboxService.getFileDetails(accessToken, path);
     System.out.print(path);
     fileDetails.ifPresentOrElse(fileDetail -> printFileMetaData(path, fileDetail),
-        () -> System.out.println("Unable to get file info for path " + path));
+        () -> {
+          System.out.println("Unable to get file info for path " + path);
+          terminate(1);
+        });
+    terminate(0);
 
   }
 
@@ -156,6 +168,10 @@ public class DropboxConsole {
 
   private String getSize(long size) {
     return sizeConverter.getString(size);
+  }
+
+  private void terminate(int statusCode) {
+    System.exit(statusCode);
   }
 }
 
