@@ -1,0 +1,9 @@
+server:
+  port: 8081
+
+logging.level:
+  org.springframework: WARN
+  com.personal.dropbox.client: DEBUG
+
+
+
