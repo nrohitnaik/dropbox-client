@@ -79,6 +79,7 @@
 	</dependencyManagement>
 
 	<build>
+		<finalName>dropbox-client</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
